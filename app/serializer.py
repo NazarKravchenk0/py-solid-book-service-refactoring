@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as element_tree
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Dict
 
-if TYPE_CHECKING:  # only for type hints, no runtime import
+if TYPE_CHECKING:
     from app.main import Book
 
 
@@ -21,18 +21,18 @@ class JsonSerializeStrategy(SerializeStrategy):
             {
                 "title": book.title,
                 "content": book.content,
-            },
+            }
         )
 
 
 class XmlSerializeStrategy(SerializeStrategy):
     def serialize(self, book: "Book") -> str:
-        root = ET.Element("book")
-        title_el = ET.SubElement(root, "title")
+        root = element_tree.Element("book")
+        title_el = element_tree.SubElement(root, "title")
         title_el.text = book.title
-        content_el = ET.SubElement(root, "content")
+        content_el = element_tree.SubElement(root, "content")
         content_el.text = book.content
-        return ET.tostring(root, encoding="unicode")
+        return element_tree.tostring(root, encoding="unicode")
 
 
 class BookSerializer:
@@ -47,6 +47,5 @@ class BookSerializer:
     def serialize(self, book: "Book", serialize_type: str) -> str:
         strategy = self._strategies.get(serialize_type)
         if strategy is None:
-            # Keep the same error message format
             raise ValueError(f"Unknown serialize type: {serialize_type}")
         return strategy.serialize(book)
